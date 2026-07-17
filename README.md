@@ -10,8 +10,7 @@
      ninja
 
 ## Additional steps for developers
-     sudo apt install clang clang-format clang-tidy dvipng texlive-latex-extra texlive-fonts-recommended cm-super texlive-science
-     pip3 install -r scripts/requirements.txt
+     sudo apt install clang clang-format clang-tidy python3-matplotlib python3-numpy pre-commit dvipng texlive-latex-extra texlive-fonts-recommended cm-super texlive-science
      python3 -m pre_commit install
 
 ## Examples
