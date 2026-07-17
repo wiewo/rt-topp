@@ -10,7 +10,7 @@ class PathAccelerationLimits {
 
  public:
   explicit PathAccelerationLimits(
-      const JointConstraints<N_JOINTS> &joint_constraints)
+      const JointConstraints<N_JOINTS>& joint_constraints)
       : joint_constraints_(joint_constraints) {}
 
   /**
@@ -29,18 +29,18 @@ class PathAccelerationLimits {
    * respectively
    */
   [[nodiscard]] std::pair<double, double> calculateDynamicLimits(
-      const PathState &path_state,
-      const JointPathDerivativeState &joint_path_derivative_state);
+      const PathState& path_state,
+      const JointPathDerivativeState& joint_path_derivative_state);
 
  private:
-  const JointConstraints<N_JOINTS> &joint_constraints_;
+  const JointConstraints<N_JOINTS>& joint_constraints_;
 };
 
 template <size_t N_JOINTS>
 std::pair<double, double>
 PathAccelerationLimits<N_JOINTS>::calculateDynamicLimits(
-    const PathState &path_state,
-    const JointPathDerivativeState &joint_path_derivative_state) {
+    const PathState& path_state,
+    const JointPathDerivativeState& joint_path_derivative_state) {
   double min_acceleration = std::numeric_limits<double>::lowest();
   double max_acceleration = std::numeric_limits<double>::max();
 

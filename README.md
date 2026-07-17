@@ -1,16 +1,16 @@
 # Real-Time Time-Optimal Trajectory Parameterization
 
-## Setup and build for users
+## Setup and build for users (tested on Ubuntu 26.04)
 
-     sudo apt install libboost-all-dev libeigen3-dev libgtest-dev libbenchmark-dev ninja-build
+     sudo apt install libboost-all-dev libeigen3-dev libgtest-dev libbenchmark-dev ninja-build nlohmann-json3-dev
      git clone --recursive https://github.com/KITrobotics/rt-topp.git rttopp
      cd rttopp
      mkdir build && cd build
-     cmake ../ -G Ninja
+     cmake ../ -G Ninja -DCMAKE_BUILD_TYPE=Release
      ninja
 
 ## Additional steps for developers
-     sudo apt install clang-10 clang-format-10 clang-tidy-10 dvipng texlive-latex-extra texlive-fonts-recommended cm-super texlive-science
+     sudo apt install clang clang-format clang-tidy dvipng texlive-latex-extra texlive-fonts-recommended cm-super texlive-science
      pip3 install -r scripts/requirements.txt
      python3 -m pre_commit install
 

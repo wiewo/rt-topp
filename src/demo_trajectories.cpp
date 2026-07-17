@@ -65,7 +65,7 @@ void initPerf() {
 
   cpu_set_t cpuset;
   CPU_ZERO(&cpuset);
-  int cpu_core = 2;
+  int cpu_core = 0;
 
   std::cout << "setting affinity to cpu core " << cpu_core << std::endl;
   CPU_SET(cpu_core, &cpuset);

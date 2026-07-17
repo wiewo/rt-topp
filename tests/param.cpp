@@ -163,7 +163,7 @@ TEST(ParamRTTOPP2, RandomWaypointsSmallStartGoalVel) {
   EXPECT_EQ(error_counter, 4);
 }
 
-int main(int argc, char **argv) {
+int main(int argc, char** argv) {
   ::testing::InitGoogleTest(&argc, argv);
   return RUN_ALL_TESTS();
 }

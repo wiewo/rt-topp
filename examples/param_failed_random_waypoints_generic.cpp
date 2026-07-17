@@ -12,11 +12,11 @@ constexpr auto N_JOINTS = 6;
 constexpr auto N_TRAJECTORIES = 100;
 
 template <typename EigenVectorType, typename VectorType>
-void fromVectroAsEigenVector(VectorType &v, EigenVectorType &mat) {
+void fromVectroAsEigenVector(VectorType& v, EigenVectorType& mat) {
   mat = Eigen::Map<EigenVectorType, Eigen::Unaligned>(v.data(), v.size());
 }
 
-rttopp::Waypoints<N_JOINTS> fromJson(const nlohmann::json &j) {
+rttopp::Waypoints<N_JOINTS> fromJson(const nlohmann::json& j) {
   size_t n_waypoints = j["waypoints"].size();
   rttopp::Waypoints<N_JOINTS> waypoints(n_waypoints);
 
@@ -24,14 +24,14 @@ rttopp::Waypoints<N_JOINTS> fromJson(const nlohmann::json &j) {
     auto joint_positions =
         j["waypoints"][idx]["joints"]["position"].get<std::vector<double>>();
 
-    auto &waypoint = waypoints[idx].joints.position;
+    auto& waypoint = waypoints[idx].joints.position;
     fromVectroAsEigenVector(joint_positions, waypoint);
   }
 
   return waypoints;
 }
 
-int main(int argc, char **argv) {  // NOLINT bugprone-exception-escape
+int main(int argc, char** argv) {  // NOLINT bugprone-exception-escape
   if (argc == 1) {
     std::cout << "Please give the directory to the .json files. Abort.";
     return EXIT_FAILURE;
@@ -47,7 +47,7 @@ int main(int argc, char **argv) {  // NOLINT bugprone-exception-escape
   size_t i = 0;
   size_t i_failed = 0;
   std::string path = argv[1];
-  for (const auto &entry :
+  for (const auto& entry :
        std::experimental::filesystem::directory_iterator(path)) {
     std::ifstream ifs(entry.path());
     nlohmann::json j = nlohmann::json::parse(ifs);

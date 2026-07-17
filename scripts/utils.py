@@ -91,9 +91,9 @@ def setup_matplotlib():
     plt.rcParams["font.size"] = 10
     plt.rcParams["mathtext.fontset"] = "cm"
     plt.rcParams["text.usetex"] = True
-    plt.rcParams[
-        "text.latex.preamble"
-    ] = r"\usepackage{siunitx} \usepackage{amsmath} \usepackage{bm}"
+    plt.rcParams["text.latex.preamble"] = (
+        r"\usepackage{siunitx} \usepackage{amsmath} \usepackage{bm}"
+    )
     plt.rcParams["pgf.preamble"] = plt.rcParams["text.latex.preamble"]
     plt.rcParams["legend.loc"] = "upper right"
     # plt.rcParams["legend.fontsize"] = 10

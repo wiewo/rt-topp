@@ -12,7 +12,7 @@ class PathVelocityLimit {
 
  public:
   explicit PathVelocityLimit(
-      const JointConstraints<N_JOINTS> &joint_constraints)
+      const JointConstraints<N_JOINTS>& joint_constraints)
       : joint_constraints_(joint_constraints) {}
 
   /**
@@ -26,7 +26,7 @@ class PathVelocityLimit {
    * @return Maximum overall velocity limit
    */
   [[nodiscard]] double calculateOverallLimit(
-      const JointPathDerivativeState &joint_path_derivative_state);
+      const JointPathDerivativeState& joint_path_derivative_state);
 
   /**
    * @brief Calculates path velocity limits based only on joint velocity
@@ -39,7 +39,7 @@ class PathVelocityLimit {
    * constraints
    */
   [[nodiscard]] double calculateJointVelocityLimit(
-      const JointPathDerivativeState &joint_path_derivative_state);
+      const JointPathDerivativeState& joint_path_derivative_state);
 
   /**
    * @brief Calculates path velocity limits based only on joint acceleration
@@ -52,7 +52,7 @@ class PathVelocityLimit {
    * acceleration constraints
    */
   [[nodiscard]] double calculateJointAccelerationLimit(
-      const JointPathDerivativeState &joint_path_derivative_state);
+      const JointPathDerivativeState& joint_path_derivative_state);
 
  private:
   /**
@@ -66,7 +66,7 @@ class PathVelocityLimit {
    * @return Maximum path velocity limit
    */
   double calculateJointAccelerationLimit1(
-      const JointPathDerivativeState &joint_path_derivative_state);
+      const JointPathDerivativeState& joint_path_derivative_state);
 
   /**
    * @brief Calculates path velocity limits based only on joint acceleration
@@ -79,14 +79,14 @@ class PathVelocityLimit {
    * @return Maximum path velocity limit
    */
   double calculateJointAccelerationLimit2(
-      const JointPathDerivativeState &joint_path_derivative_state);
+      const JointPathDerivativeState& joint_path_derivative_state);
 
-  const JointConstraints<N_JOINTS> &joint_constraints_;
+  const JointConstraints<N_JOINTS>& joint_constraints_;
 };
 
 template <size_t N_JOINTS>
 double PathVelocityLimit<N_JOINTS>::calculateOverallLimit(
-    const JointPathDerivativeState &joint_path_derivative_state) {
+    const JointPathDerivativeState& joint_path_derivative_state) {
   const auto upper_velocity =
       calculateJointVelocityLimit(joint_path_derivative_state);
   const auto upper_acceleration =
@@ -102,7 +102,7 @@ double PathVelocityLimit<N_JOINTS>::calculateOverallLimit(
 
 template <size_t N_JOINTS>
 double PathVelocityLimit<N_JOINTS>::calculateJointVelocityLimit(
-    const JointPathDerivativeState &joint_path_derivative_state) {
+    const JointPathDerivativeState& joint_path_derivative_state) {
   double velocity_max = std::numeric_limits<double>::max();
 
   for (size_t i = 0; i < N_JOINTS; ++i) {
@@ -126,7 +126,7 @@ double PathVelocityLimit<N_JOINTS>::calculateJointVelocityLimit(
 
 template <size_t N_JOINTS>
 double PathVelocityLimit<N_JOINTS>::calculateJointAccelerationLimit(
-    const JointPathDerivativeState &joint_path_derivative_state) {
+    const JointPathDerivativeState& joint_path_derivative_state) {
   const auto upper1 =
       calculateJointAccelerationLimit1(joint_path_derivative_state);
   const auto upper2 =
@@ -137,7 +137,7 @@ double PathVelocityLimit<N_JOINTS>::calculateJointAccelerationLimit(
 
 template <size_t N_JOINTS>
 double PathVelocityLimit<N_JOINTS>::calculateJointAccelerationLimit1(
-    const JointPathDerivativeState &joint_path_derivative_state) {
+    const JointPathDerivativeState& joint_path_derivative_state) {
   double velocity_max = std::numeric_limits<double>::max();
 
   for (size_t i = 0; i < N_JOINTS; ++i) {
@@ -190,7 +190,7 @@ double PathVelocityLimit<N_JOINTS>::calculateJointAccelerationLimit1(
 
 template <size_t N_JOINTS>
 double PathVelocityLimit<N_JOINTS>::calculateJointAccelerationLimit2(
-    const JointPathDerivativeState &joint_path_derivative_state) {
+    const JointPathDerivativeState& joint_path_derivative_state) {
   double velocity_max = std::numeric_limits<double>::max();
 
   for (std::size_t i = 0; i < N_JOINTS; ++i) {

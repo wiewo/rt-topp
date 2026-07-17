@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.1)
+cmake_minimum_required(VERSION 3.10)
 project(rttopp)
 
 set(CMAKE_CXX_STANDARD 17)
@@ -14,10 +14,10 @@ endif()
 set(JSON_BuildTests
     OFF
     CACHE INTERNAL "")
-add_subdirectory(external/json)
+find_package(nlohmann_json REQUIRED)
 
 find_package(benchmark REQUIRED)
-find_package(Boost REQUIRED)
+find_package(Boost CONFIG REQUIRED)
 find_package(Eigen3 REQUIRED)
 
 set(GTest_ROOT /usr/src/googletest/googletest)

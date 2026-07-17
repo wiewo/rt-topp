@@ -132,6 +132,7 @@ class Preprocessing {
   /**
    * @brief Compute the spline coefficients given the waypoints. Update the
    * path variable in a iterative manner.
+   * not used anymore
    *
    * @param wps Input waypoints
    */
@@ -148,13 +149,14 @@ class Preprocessing {
   [[nodiscard]] DerivativesDataType computeDerivatives(double s);
 
   /**
-   * @brief
+   * @brief not used anymore
    *
    */
   void computeDerivativesFull();
 
   /**
    * @brief Prepare the entries of the matrix to compute spline coefficients
+   * only used in computeCoefficientsIterarive(), which is not used anymore
    *
    * @param wps Input waypoints
    */

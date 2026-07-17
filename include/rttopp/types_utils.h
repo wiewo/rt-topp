@@ -46,7 +46,7 @@ class Result {
 
   [[nodiscard]] bool set() const { return value_ != NOT_SET; }
 
-  [[nodiscard]] const char *message() const {
+  [[nodiscard]] const char* message() const {
     switch (value_) {
       case SUCCESS:
         return "SUCCESS";
@@ -121,7 +121,7 @@ using WaypointJointDataType = Eigen::Matrix<double, N_DOF, 1>;
 
 template <size_t N_DOF>
 struct WaypointJoint {
-  WaypointJointDataType<N_DOF> position;
+  WaypointJointDataType<N_DOF> position = WaypointJointDataType<N_DOF>::Zero();
   WaypointJointDataType<N_DOF> velocity = WaypointJointDataType<N_DOF>::Zero();
   WaypointJointDataType<N_DOF> acceleration =
       WaypointJointDataType<N_DOF>::Zero();
@@ -266,18 +266,18 @@ constexpr T pow(T x, unsigned int y) {
  * @param mat
  */
 template <typename ScalarType = double, typename VectorType, int Rows, int Cols>
-void setMatrixAsVector(VectorType &v,
-                       const Eigen::Matrix<ScalarType, Rows, Cols> &mat) {
+void setMatrixAsVector(VectorType& v,
+                       const Eigen::Matrix<ScalarType, Rows, Cols>& mat) {
   v.resize(mat.rows() * mat.cols());
   Eigen::Map<Eigen::Matrix<ScalarType, Rows, Cols>>(
-      reinterpret_cast<ScalarType *>(v.data()), mat.rows(), mat.cols()) = mat;
+      reinterpret_cast<ScalarType*>(v.data()), mat.rows(), mat.cols()) = mat;
 }
 
 template <size_t N_JOINTS>
-nlohmann::json jointStateToJson(const WaypointJoint<N_JOINTS> &joint_state) {
+nlohmann::json jointStateToJson(const WaypointJoint<N_JOINTS>& joint_state) {
   nlohmann::json j;
 
-  const auto eigen_to_std = [](const Eigen::MatrixXd &mat) {
+  const auto eigen_to_std = [](const Eigen::MatrixXd& mat) {
     return std::vector<double>(mat.data(),
                                mat.data() + mat.rows() * mat.cols());
   };

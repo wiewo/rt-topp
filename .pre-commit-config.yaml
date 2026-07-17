@@ -3,7 +3,7 @@
 exclude: '.\.nb$'
 repos:
 -   repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v3.4.0
+    rev: v6.0.0
     hooks:
     -   id: trailing-whitespace
     -   id: end-of-file-fixer
@@ -15,15 +15,15 @@ repos:
 #     rev: 4.0.1
 #     hooks:
 #     -   id: flake8
--   repo: https://github.com/ambv/black
-    rev: 22.3.0
+-   repo: https://github.com/psf/black
+    rev: 26.5.1
     hooks:
     -   id: black
 -   repo: https://github.com/pocc/pre-commit-hooks
     rev: v1.1.1
     hooks:
       - id: clang-format
-        entry: clang-format-10
+        entry: clang-format
         args: [-style=file, -i]
 # clang-tidy is run separately in CI
 #      - id: clang-tidy

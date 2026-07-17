@@ -34,52 +34,52 @@ class RTTOPP2 {
   // numbers finite, constraints vel_min < 0, vel_max > 0, min < max,
   // cycle_time/path_resolution > 0.0)
 
-  Result parameterizeFull(const Constraints<N_JOINTS> &constraints,
-                          const Waypoints<N_JOINTS> &waypoints);
+  Result parameterizeFull(const Constraints<N_JOINTS>& constraints,
+                          const Waypoints<N_JOINTS>& waypoints);
 
   // per-cycle methods
-  Result initParameterization(const Constraints<N_JOINTS> &constraints,
-                              const Waypoints<N_JOINTS> &waypoints);
+  Result initParameterization(const Constraints<N_JOINTS>& constraints,
+                              const Waypoints<N_JOINTS>& waypoints);
   Result keepParam();
-  Result sample(State<N_JOINTS> *new_state);
+  Result sample(State<N_JOINTS>* new_state);
 
   // generate whole trajectory at once, not real-time
   // needs at least a call to initParameterization() first
-  Result sampleFull(Trajectory<N_JOINTS> *trajectory);
+  Result sampleFull(Trajectory<N_JOINTS>* trajectory);
 
   // for sampling
   [[nodiscard]] Result verifyTrajectory(
-      const Trajectory<N_JOINTS> &trajectory, bool verbose = false,
-      size_t *num_idx = nullptr, double *mean = nullptr,
-      double *std_dev = nullptr, double *max_normalized_velocity = nullptr,
-      double *max_normalized_acceleration = nullptr) const;
+      const Trajectory<N_JOINTS>& trajectory, bool verbose = false,
+      size_t* num_idx = nullptr, double* mean = nullptr,
+      double* std_dev = nullptr, double* max_normalized_velocity = nullptr,
+      double* max_normalized_acceleration = nullptr) const;
   [[nodiscard]] Result verifyTrajectory(
-      bool verbose = false, size_t *num_idx = nullptr, double *mean = nullptr,
-      double *std_dev = nullptr, double *max_normalized_velocity = nullptr,
-      double *max_normalized_acceleration = nullptr,
-      double *traj_length = nullptr) const;
+      bool verbose = false, size_t* num_idx = nullptr, double* mean = nullptr,
+      double* std_dev = nullptr, double* max_normalized_velocity = nullptr,
+      double* max_normalized_acceleration = nullptr,
+      double* traj_length = nullptr) const;
 
   [[nodiscard]] nlohmann::json toJson(
-      const Waypoints<N_JOINTS> &waypoints,
-      const Trajectory<N_JOINTS> &trajectory) const;
+      const Waypoints<N_JOINTS>& waypoints,
+      const Trajectory<N_JOINTS>& trajectory) const;
   [[nodiscard]] nlohmann::json toJson(
-      const Waypoints<N_JOINTS> &waypoints) const;
+      const Waypoints<N_JOINTS>& waypoints) const;
 
  private:
   using JointPathDerivativeState = JointPathDerivatives<N_JOINTS>;
 
   Result passLocal(bool forward, bool first);
   [[nodiscard]] PathState integrateLocalForward(
-      size_t current_idx, const PathState &current_state) const;
+      size_t current_idx, const PathState& current_state) const;
   [[nodiscard]] PathState integrateLocalBackward(
-      size_t current_idx, const PathState &current_state) const;
-  [[nodiscard]] double calculateTimeDiff(const PathState &current_state,
-                                         const PathState &previous_state) const;
+      size_t current_idx, const PathState& current_state) const;
+  [[nodiscard]] double calculateTimeDiff(const PathState& current_state,
+                                         const PathState& previous_state) const;
   [[nodiscard]] double calculatePathAcceleration(
-      const PathState &current_state, const PathState &previous_state) const;
+      const PathState& current_state, const PathState& previous_state) const;
   [[nodiscard]] WaypointJoint<N_JOINTS> calculateJointDerivativeState(
-      const PathState &current_state,
-      const JointPathDerivativeState &joint_path_derivative_state) const;
+      const PathState& current_state,
+      const JointPathDerivativeState& joint_path_derivative_state) const;
 
   Preprocessing<N_JOINTS, MAX_WAYPOINTS, MAX_STEPS> preprocess_;
 
@@ -113,8 +113,8 @@ class RTTOPP2 {
 // full parameterization
 template <size_t N_JOINTS, size_t MAX_WAYPOINTS, size_t MAX_STEPS>
 Result RTTOPP2<N_JOINTS, MAX_WAYPOINTS, MAX_STEPS>::parameterizeFull(
-    const Constraints<N_JOINTS> &constraints,
-    const Waypoints<N_JOINTS> &waypoints) {
+    const Constraints<N_JOINTS>& constraints,
+    const Waypoints<N_JOINTS>& waypoints) {
   bool forward_first = false;
 
   Result result;
@@ -142,7 +142,7 @@ Result RTTOPP2<N_JOINTS, MAX_WAYPOINTS, MAX_STEPS>::parameterizeFull(
   }
 
   for (size_t idx = 0; idx < num_idx_; ++idx) {
-    const auto &path_state =
+    const auto& path_state =
         forward_first ? backward_pass_states_[idx] : forward_pass_states_[idx];
     joint_trajectory_[idx] = calculateJointDerivativeState(
         path_state, preprocess_.getDerivatives(idx));
@@ -168,8 +168,8 @@ Result RTTOPP2<N_JOINTS, MAX_WAYPOINTS, MAX_STEPS>::parameterizeFull(
 
 template <size_t N_JOINTS, size_t MAX_WAYPOINTS, size_t MAX_STEPS>
 Result RTTOPP2<N_JOINTS, MAX_WAYPOINTS, MAX_STEPS>::initParameterization(
-    const Constraints<N_JOINTS> &constraints,
-    const Waypoints<N_JOINTS> &waypoints) {
+    const Constraints<N_JOINTS>& constraints,
+    const Waypoints<N_JOINTS>& waypoints) {
   constraints_ = constraints;
 
   // TODO(wolfgang): does a full bw param for now
@@ -202,7 +202,7 @@ Result RTTOPP2<N_JOINTS, MAX_WAYPOINTS, MAX_STEPS>::keepParam() {
 
 template <size_t N_JOINTS, size_t MAX_WAYPOINTS, size_t MAX_STEPS>
 Result RTTOPP2<N_JOINTS, MAX_WAYPOINTS, MAX_STEPS>::sampleFull(
-    Trajectory<N_JOINTS> *trajectory) {
+    Trajectory<N_JOINTS>* trajectory) {
   Result result;
 
   do {
@@ -216,13 +216,13 @@ Result RTTOPP2<N_JOINTS, MAX_WAYPOINTS, MAX_STEPS>::sampleFull(
 
 template <size_t N_JOINTS, size_t MAX_WAYPOINTS, size_t MAX_STEPS>
 Result RTTOPP2<N_JOINTS, MAX_WAYPOINTS, MAX_STEPS>::sample(
-    State<N_JOINTS> *new_state) {
+    State<N_JOINTS>* new_state) {
   PathAccelerationLimits<N_JOINTS> path_acceleration_limits(
       constraints_.joints);
   PathVelocityLimit<N_JOINTS> path_velocity_limit(constraints_.joints);
 
-  auto &path_state = current_full_state_.path_state;
-  auto &derivatives = current_full_state_.derivatives;
+  auto& path_state = current_full_state_.path_state;
+  auto& derivatives = current_full_state_.derivatives;
 
   if (path_state.position >= end_state_.position) {
     // TODO(wolfgang): lineary extrapolate here with constant velocity in
@@ -235,7 +235,7 @@ Result RTTOPP2<N_JOINTS, MAX_WAYPOINTS, MAX_STEPS>::sample(
     return Result::FINISHED;
   }
 
-  const auto &previous_pass_state =
+  const auto& previous_pass_state =
       backward_pass_states_[current_full_state_.bw_idx];
 
   double acc_min, acc_max;
@@ -320,7 +320,7 @@ Result RTTOPP2<N_JOINTS, MAX_WAYPOINTS, MAX_STEPS>::sample(
     assert(current_full_state_.bw_idx > 0 &&
            current_full_state_.bw_idx < num_idx_);
   }
-  const auto &next_pass_state =
+  const auto& next_pass_state =
       backward_pass_states_[current_full_state_.bw_idx];
   // linear interpolation between next and previous pass state
   const auto interp_next_vel =
@@ -352,7 +352,7 @@ Result RTTOPP2<N_JOINTS, MAX_WAYPOINTS, MAX_STEPS>::sample(
     } while (backward_pass_states_[current_full_state_.bw_idx - 1].position >
              path_state.position + position_diff);
 
-    const auto &new_next_pass_state =
+    const auto& new_next_pass_state =
         backward_pass_states_[current_full_state_.bw_idx];
     if (new_next_pass_state.velocity < path_state.velocity) {
       std::cout << "need to clip again after goint back" << std::endl;
@@ -478,7 +478,7 @@ Result RTTOPP2<N_JOINTS, MAX_WAYPOINTS, MAX_STEPS>::passLocal(
 
       current_state.velocity = std::min(current_state.velocity, vel_abs_max);
     } else {
-      const auto &previous_pass_state = forward
+      const auto& previous_pass_state = forward
                                             ? backward_pass_states_[current_idx]
                                             : forward_pass_states_[current_idx];
       current_state.velocity =
@@ -501,7 +501,7 @@ Result RTTOPP2<N_JOINTS, MAX_WAYPOINTS, MAX_STEPS>::passLocal(
     }
 
     if (current_idx < int(num_idx_ - 1) && current_idx > 0) {
-      const auto &previous_state = forward
+      const auto& previous_state = forward
                                        ? forward_pass_states_[current_idx - 1]
                                        : backward_pass_states_[current_idx + 1];
       // When velocity stalls at the minimum value over two
@@ -576,13 +576,13 @@ Result RTTOPP2<N_JOINTS, MAX_WAYPOINTS, MAX_STEPS>::passLocal(
     }
     current_state.acc_max = acc_max;
     current_state.acc_min = acc_min;
-    auto &parameterized_state = forward ? forward_pass_states_[current_idx]
+    auto& parameterized_state = forward ? forward_pass_states_[current_idx]
                                         : backward_pass_states_[current_idx];
     parameterized_state = current_state;
 
     if (forward) {
       if (current_idx > 0) {
-        auto &previous_fw_state = forward_pass_states_[current_idx - 1];
+        auto& previous_fw_state = forward_pass_states_[current_idx - 1];
         previous_fw_state.acceleration =
             calculatePathAcceleration(current_state, previous_fw_state);
       }
@@ -595,7 +595,7 @@ Result RTTOPP2<N_JOINTS, MAX_WAYPOINTS, MAX_STEPS>::passLocal(
       if (current_idx < int(num_idx_ - 1)) {
         // TODO(wolfgang): computes actual acceleration, only needed for
         // debugging/plotting in bw pass, can be moved
-        auto &previous_bw_state = backward_pass_states_[current_idx + 1];
+        auto& previous_bw_state = backward_pass_states_[current_idx + 1];
         previous_bw_state.acceleration =
             calculatePathAcceleration(current_state, previous_bw_state);
       }
@@ -628,7 +628,7 @@ Result RTTOPP2<N_JOINTS, MAX_WAYPOINTS, MAX_STEPS>::passLocal(
 // integration for forward integration
 template <size_t N_JOINTS, size_t MAX_WAYPOINTS, size_t MAX_STEPS>
 PathState RTTOPP2<N_JOINTS, MAX_WAYPOINTS, MAX_STEPS>::integrateLocalForward(
-    const size_t current_idx, const PathState &current_state) const {
+    const size_t current_idx, const PathState& current_state) const {
   PathState next_state{};
   next_state.position = preprocess_.getPathPosition(current_idx + 1);
   const auto delta_position =
@@ -644,7 +644,7 @@ PathState RTTOPP2<N_JOINTS, MAX_WAYPOINTS, MAX_STEPS>::integrateLocalForward(
 
 template <size_t N_JOINTS, size_t MAX_WAYPOINTS, size_t MAX_STEPS>
 PathState RTTOPP2<N_JOINTS, MAX_WAYPOINTS, MAX_STEPS>::integrateLocalBackward(
-    const size_t current_idx, const PathState &current_state) const {
+    const size_t current_idx, const PathState& current_state) const {
   PathState next_state{};
   next_state.position = preprocess_.getPathPosition(current_idx - 1);
   const auto delta_position =
@@ -666,7 +666,7 @@ PathState RTTOPP2<N_JOINTS, MAX_WAYPOINTS, MAX_STEPS>::integrateLocalBackward(
 
 template <size_t N_JOINTS, size_t MAX_WAYPOINTS, size_t MAX_STEPS>
 double RTTOPP2<N_JOINTS, MAX_WAYPOINTS, MAX_STEPS>::calculatePathAcceleration(
-    const PathState &current_state, const PathState &previous_state) const {
+    const PathState& current_state, const PathState& previous_state) const {
   // see eq. 78 in Verscheure et al. Time-Optimal Path Tracking for Robots: A
   // Convex Optimization Approach, simply local integration formula reordered
   const auto delta_position = current_state.position - previous_state.position;
@@ -679,7 +679,7 @@ double RTTOPP2<N_JOINTS, MAX_WAYPOINTS, MAX_STEPS>::calculatePathAcceleration(
 
 template <size_t N_JOINTS, size_t MAX_WAYPOINTS, size_t MAX_STEPS>
 double RTTOPP2<N_JOINTS, MAX_WAYPOINTS, MAX_STEPS>::calculateTimeDiff(
-    const PathState &current_state, const PathState &previous_state) const {
+    const PathState& current_state, const PathState& previous_state) const {
   const auto delta_position = current_state.position - previous_state.position;
 
   // follows from second-order equations of motions
@@ -690,8 +690,8 @@ double RTTOPP2<N_JOINTS, MAX_WAYPOINTS, MAX_STEPS>::calculateTimeDiff(
 template <size_t N_JOINTS, size_t MAX_WAYPOINTS, size_t MAX_STEPS>
 WaypointJoint<N_JOINTS>
 RTTOPP2<N_JOINTS, MAX_WAYPOINTS, MAX_STEPS>::calculateJointDerivativeState(
-    const PathState &current_state,
-    const JointPathDerivativeState &joint_path_derivative_state) const {
+    const PathState& current_state,
+    const JointPathDerivativeState& joint_path_derivative_state) const {
   WaypointJoint<N_JOINTS> joint_state;
   joint_state.velocity =
       joint_path_derivative_state.first * current_state.velocity;
@@ -705,14 +705,14 @@ RTTOPP2<N_JOINTS, MAX_WAYPOINTS, MAX_STEPS>::calculateJointDerivativeState(
 
 template <size_t N_JOINTS, size_t MAX_WAYPOINTS, size_t MAX_STEPS>
 Result RTTOPP2<N_JOINTS, MAX_WAYPOINTS, MAX_STEPS>::verifyTrajectory(
-    const Trajectory<N_JOINTS> &trajectory, const bool verbose, size_t *num_idx,
-    double *mean, double *std_dev, double *max_normalized_velocity,
-    double *max_normalized_acceleration) const {
+    const Trajectory<N_JOINTS>& trajectory, const bool verbose, size_t* num_idx,
+    double* mean, double* std_dev, double* max_normalized_velocity,
+    double* max_normalized_acceleration) const {
   PathVelocityLimit<N_JOINTS> path_velocity_limit(constraints_.joints);
 
   for (size_t idx = 0; idx < num_idx_; ++idx) {
     const auto joint_path_derivatives = preprocess_.getDerivatives(idx);
-    const auto &bw_path_state = backward_pass_states_[idx];
+    const auto& bw_path_state = backward_pass_states_[idx];
 
     if (bw_path_state.velocity >
         path_velocity_limit.calculateOverallLimit(joint_path_derivatives)) {
@@ -723,10 +723,10 @@ Result RTTOPP2<N_JOINTS, MAX_WAYPOINTS, MAX_STEPS>::verifyTrajectory(
   }
 
   for (size_t idx = 0; idx < trajectory.size(); ++idx) {
-    const auto &state = trajectory[idx];
+    const auto& state = trajectory[idx];
     const auto fw_path_state = state.path_state;
-    const auto &prev_bw_state = backward_pass_states_[state.bw_idx];
-    const auto &next_bw_state = backward_pass_states_[state.bw_idx + 1];
+    const auto& prev_bw_state = backward_pass_states_[state.bw_idx];
+    const auto& next_bw_state = backward_pass_states_[state.bw_idx + 1];
     const auto joint_state = state.waypoint.joints;
 
     if (!(prev_bw_state.position < fw_path_state.position &&
@@ -812,8 +812,8 @@ Result RTTOPP2<N_JOINTS, MAX_WAYPOINTS, MAX_STEPS>::verifyTrajectory(
       trajectory.size());
   Eigen::VectorXd infinity_norm(num_idx_);
   for (size_t idx = 0; idx < trajectory.size(); ++idx) {
-    const auto &joint_state = trajectory[idx].waypoint.joints;
-    auto &joint_state_normalized = joint_trajectory_normalized[idx];
+    const auto& joint_state = trajectory[idx].waypoint.joints;
+    auto& joint_state_normalized = joint_trajectory_normalized[idx];
 
     for (size_t joint = 0; joint < N_JOINTS; ++joint) {
       // TODO(wolfgang): taking the max only works when the limits have
@@ -880,16 +880,16 @@ Result RTTOPP2<N_JOINTS, MAX_WAYPOINTS, MAX_STEPS>::verifyTrajectory(
 // TODO(wolfgang): refactor with the duplicate code above, above for sampling
 template <size_t N_JOINTS, size_t MAX_WAYPOINTS, size_t MAX_STEPS>
 Result RTTOPP2<N_JOINTS, MAX_WAYPOINTS, MAX_STEPS>::verifyTrajectory(
-    const bool verbose, size_t *num_idx, double *mean, double *std_dev,
-    double *max_normalized_velocity, double *max_normalized_acceleration,
-    double *traj_length) const {
+    const bool verbose, size_t* num_idx, double* mean, double* std_dev,
+    double* max_normalized_velocity, double* max_normalized_acceleration,
+    double* traj_length) const {
   PathVelocityLimit<N_JOINTS> path_velocity_limit(constraints_.joints);
 
   for (size_t idx = 0; idx < num_idx_; ++idx) {
     const auto joint_path_derivatives = preprocess_.getDerivatives(idx);
-    const auto &bw_path_state = backward_pass_states_[idx];
-    const auto &fw_path_state = forward_pass_states_[idx];
-    const auto &joint_state = joint_trajectory_[idx];
+    const auto& bw_path_state = backward_pass_states_[idx];
+    const auto& fw_path_state = forward_pass_states_[idx];
+    const auto& joint_state = joint_trajectory_[idx];
 
     if (bw_path_state.velocity >
         path_velocity_limit.calculateOverallLimit(joint_path_derivatives)) {
@@ -947,8 +947,8 @@ Result RTTOPP2<N_JOINTS, MAX_WAYPOINTS, MAX_STEPS>::verifyTrajectory(
   std::vector<WaypointJoint<N_JOINTS>> joint_trajectory_normalized(num_idx_);
   Eigen::VectorXd infinity_norm(num_idx_);
   for (size_t idx = 0; idx < num_idx_; ++idx) {
-    const auto &joint_state = joint_trajectory_[idx];
-    auto &joint_state_normalized = joint_trajectory_normalized[idx];
+    const auto& joint_state = joint_trajectory_[idx];
+    auto& joint_state_normalized = joint_trajectory_normalized[idx];
 
     for (size_t joint = 0; joint < N_JOINTS; ++joint) {
       // TODO(wolfgang): taking the max only works when the limits have
@@ -1020,13 +1020,13 @@ Result RTTOPP2<N_JOINTS, MAX_WAYPOINTS, MAX_STEPS>::verifyTrajectory(
 
 template <size_t N_JOINTS, size_t MAX_WAYPOINTS, size_t MAX_STEPS>
 nlohmann::json RTTOPP2<N_JOINTS, MAX_WAYPOINTS, MAX_STEPS>::toJson(
-    const Waypoints<N_JOINTS> &waypoints,
-    const Trajectory<N_JOINTS> &trajectory) const {
+    const Waypoints<N_JOINTS>& waypoints,
+    const Trajectory<N_JOINTS>& trajectory) const {
   nlohmann::json j;
   PathVelocityLimit<N_JOINTS> path_velocity_limit(constraints_.joints);
 
   for (size_t idx = 0; idx < waypoints.size(); ++idx) {
-    const auto &waypoint = waypoints[idx];
+    const auto& waypoint = waypoints[idx];
     j["waypoints"][idx]["idx"] = idx;
     j["waypoints"][idx]["idx_on_path"] =
         preprocess_.getWaypointPathIndices(idx);
@@ -1040,7 +1040,7 @@ nlohmann::json RTTOPP2<N_JOINTS, MAX_WAYPOINTS, MAX_STEPS>::toJson(
   for (size_t idx = 0; idx < num_idx_; ++idx) {
     j["path_parameterization_bw"][idx]["idx"] = idx;
 
-    const auto &backward_state = backward_pass_states_[idx];
+    const auto& backward_state = backward_pass_states_[idx];
 
     j["path_parameterization_bw"][idx]["position"] = backward_state.position;
     j["path_parameterization_bw"][idx]["velocity"] = backward_state.velocity;
@@ -1090,7 +1090,7 @@ nlohmann::json RTTOPP2<N_JOINTS, MAX_WAYPOINTS, MAX_STEPS>::toJson(
   for (size_t idx = 0; idx < trajectory.size(); ++idx) {
     j["path_parameterization_fw"][idx]["idx"] = idx;
 
-    const auto &state = trajectory[idx];
+    const auto& state = trajectory[idx];
     const auto fw_path_state = state.path_state;
     const auto joint_state = state.waypoint.joints;
 
@@ -1148,12 +1148,12 @@ nlohmann::json RTTOPP2<N_JOINTS, MAX_WAYPOINTS, MAX_STEPS>::toJson(
 // sampling
 template <size_t N_JOINTS, size_t MAX_WAYPOINTS, size_t MAX_STEPS>
 nlohmann::json RTTOPP2<N_JOINTS, MAX_WAYPOINTS, MAX_STEPS>::toJson(
-    const Waypoints<N_JOINTS> &waypoints) const {
+    const Waypoints<N_JOINTS>& waypoints) const {
   nlohmann::json j;
   PathVelocityLimit<N_JOINTS> path_velocity_limit(constraints_.joints);
 
   for (size_t idx = 0; idx < waypoints.size(); ++idx) {
-    const auto &waypoint = waypoints[idx];
+    const auto& waypoint = waypoints[idx];
     j["waypoints"][idx]["idx"] = idx;
     j["waypoints"][idx]["idx_on_path"] =
         preprocess_.getWaypointPathIndices(idx);
@@ -1167,8 +1167,8 @@ nlohmann::json RTTOPP2<N_JOINTS, MAX_WAYPOINTS, MAX_STEPS>::toJson(
   for (size_t idx = 0; idx < num_idx_; ++idx) {
     j["path_parameterization"][idx]["idx"] = idx;
 
-    const auto &forward_state = forward_pass_states_[idx];
-    const auto &backward_state = backward_pass_states_[idx];
+    const auto& forward_state = forward_pass_states_[idx];
+    const auto& backward_state = backward_pass_states_[idx];
 
     j["path_parameterization"][idx]["position"] = backward_state.position;
     j["path_parameterization"][idx]["forward"]["velocity"] =

@@ -391,7 +391,7 @@ TEST(PathVelocityLimit, RandomWaypointsAsymConstraints) {
 // TODO(wolfgang): add tests with asymmetric acceleration constraints
 // also with min/max value having the same sign
 
-int main(int argc, char **argv) {
+int main(int argc, char** argv) {
   ::testing::InitGoogleTest(&argc, argv);
   return RUN_ALL_TESTS();
 }
